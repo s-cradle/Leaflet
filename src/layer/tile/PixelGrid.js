@@ -2,7 +2,6 @@
 import {GridLayer} from './GridLayer';
 import * as Browser from '../../core/Browser';
 import * as Util from '../../core/Util';
-import * as DomEvent from '../../dom/DomEvent';
 import * as DomUtil from '../../dom/DomUtil';
 import {toPoint} from '../../geometry/Point';
 import {toBounds} from '../../geometry/Bounds';
@@ -32,7 +31,7 @@ export var PixelGrid = GridLayer.extend({
 	},
 
 	// Full rewrite of GridLayer._updateLevels to support dumpToCanvas
-	_updateLevels: function() {
+	_updateLevels: function () {
 		var zoom = this._tileZoom,
 		    maxZoom = this.options.maxZoom,
 		    dump = this.options.dumpToCanvas;
@@ -83,7 +82,7 @@ export var PixelGrid = GridLayer.extend({
 		return level;
 	},
 
-	_removeTile: function(key) {
+	_removeTile: function (key) {
 		if (this.options.dumpToCanvas) {
 			var tile = this._tiles[key],
 			    level = this._levels[tile.coords.z],
@@ -114,18 +113,18 @@ export var PixelGrid = GridLayer.extend({
 		this._tileZoom = null;
 	},
 
-	_resetCanvasSize: function(level) {
+	_resetCanvasSize: function (level) {
 		var buff = this.options.keepBuffer,
 		    pixelBounds = this._getTiledPixelBounds(this._map.getCenter()),
 		    tileRange = this._pxBoundsToTileRange(pixelBounds),
 		    tileSize = this.getTileSize();
 
 		tileRange.min = tileRange.min.subtract([buff, buff]);	// This adds the no-prune buffer
-		tileRange.max = tileRange.max.add([buff+1, buff+1]);
+		tileRange.max = tileRange.max.add([buff + 1, buff + 1]);
 
 		var pixelRange = toBounds(
-		    	tileRange.min.scaleBy(tileSize),
-		    	tileRange.max.add([1, 1]).scaleBy(tileSize)	// This prevents an off-by-one when checking if tiles are inside
+		        tileRange.min.scaleBy(tileSize),
+		        tileRange.max.add([1, 1]).scaleBy(tileSize)	// This prevents an off-by-one when checking if tiles are inside
 		    ),
 		    mustRepositionCanvas = false,
 		    neededSize = pixelRange.max.subtract(pixelRange.min);
@@ -186,8 +185,8 @@ export var PixelGrid = GridLayer.extend({
 		}
 	},
 
-	/// set transform/position of canvas, in addition to the transform/position of the individual tile container
-	_setZoomTransform: function(level, center, zoom) {
+	// set transform/position of canvas, in addition to the transform/position of the individual tile container
+	_setZoomTransform: function (level, center, zoom) {
 		GridLayer.prototype._setZoomTransform.call(this, level, center, zoom);
 		if (this.options.dumpToCanvas) {
 			this._setCanvasZoomTransform(level, center, zoom);
@@ -197,7 +196,7 @@ export var PixelGrid = GridLayer.extend({
 	// This will get called twice:
 	// * From _setZoomTransform
 	// * When the canvas has shifted due to a new tile being loaded
-	_setCanvasZoomTransform: function(level, center, zoom){
+	_setCanvasZoomTransform: function (level, center, zoom) {
 		if (!level.canvasOrigin) { return; }
 		var scale = this._map.getZoomScale(zoom, level.zoom),
 		    translate = level.canvasOrigin.multiplyBy(scale)
@@ -250,7 +249,7 @@ export var PixelGrid = GridLayer.extend({
 		}
 	},
 
-	_dumpTileToCanvas: function(tile){
+	_dumpTileToCanvas: function (tile) {
 		this.dumpPixels(tile.coords, tile.el);
 
 		// Do not remove the tile itself, as it is needed to check if the whole
@@ -268,7 +267,7 @@ export var PixelGrid = GridLayer.extend({
 	// like `{x: Number, y: Number, z: Number}`; the image source must have the
 	// same size as the `tileSize` option for the layer. Has no effect if `dumpToCanvas`
 	// is `false`.
-	dumpPixels: function(coords, imageSource) {
+	dumpPixels: function (coords, imageSource) {
 		var level = this._levels[coords.z],
 		    tileSize = this.getTileSize();
 
@@ -284,13 +283,10 @@ export var PixelGrid = GridLayer.extend({
 		// Where in the canvas should this tile go?
 		var offset = toPoint(coords.x, coords.y).subtract(level.canvasRange.min).scaleBy(this.getTileSize());
 
-// 		console.log('Should dump tile to canvas:', tile);
-// 		console.log('Dumping:', coords, "at", offset );
-
 		level.ctx.drawImage(imageSource, offset.x, offset.y, tileSize.x, tileSize.y);
 
-		/// TODO: Clear the pixels of other levels' canvases where they overlap
-		/// this newly dumped tile.
+		// TODO: Clear the pixels of other levels' canvases where they overlap
+		// this newly dumped tile.
 		return this;
 	}
 
