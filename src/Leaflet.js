@@ -117,6 +117,7 @@ export {Marker, marker} from './layer/marker/Marker';
 
 // layer, tile
 export {GridLayer, gridLayer} from './layer/tile/GridLayer';
+export {PixelGrid, pixelGrid} from './layer/tile/PixelGrid';
 import {TileLayer, tileLayer} from './layer/tile/TileLayer';
 import {TileLayerWMS, tileLayerWMS} from './layer/tile/TileLayer.WMS';
 TileLayer.WMS = TileLayerWMS;
