@@ -64,7 +64,7 @@ L.Map.Tap = L.Handler.extend({
 		if (this._fireClick && e && e.changedTouches) {
 
 			var first = e.changedTouches[0],
-			    el = first.target;
+			    el = (e.path && e.path[0]) || first.target;
 
 			if (el && el.tagName && el.tagName.toLowerCase() === 'a') {
 				L.DomUtil.removeClass(el, 'leaflet-active');
@@ -72,7 +72,7 @@ L.Map.Tap = L.Handler.extend({
 
 			// simulate click if the touch didn't move too much
 			if (this._isTapValid()) {
-				this._simulateEvent('click', first);
+				this._simulateEvent('click', first, (e.path && e.path[0]));
 			}
 		}
 	},
@@ -86,11 +86,12 @@ L.Map.Tap = L.Handler.extend({
 		this._newPos = new L.Point(first.clientX, first.clientY);
 	},
 
-	_simulateEvent: function (type, e) {
+	_simulateEvent: function (type, e, rootTarget) {
 		var simulatedEvent = document.createEvent('MouseEvents');
+		var target = rootTarget || e.target;
 
 		simulatedEvent._simulated = true;
-		e.target._simulatedClick = true;
+		target._simulatedClick = true;
 
 		simulatedEvent.initMouseEvent(
 		        type, true, true, window, 1,
@@ -98,7 +99,7 @@ L.Map.Tap = L.Handler.extend({
 		        e.clientX, e.clientY,
 		        false, false, false, false, 0, null);
 
-		e.target.dispatchEvent(simulatedEvent);
+		target.dispatchEvent(simulatedEvent);
 	}
 });
 
